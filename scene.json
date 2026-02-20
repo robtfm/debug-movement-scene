@@ -1,0 +1,56 @@
+{
+  "ecs7": true,
+  "runtimeVersion": "7",
+  "display": {
+    "title": "debug bevy explorer movement scene",
+    "description": "debug movement scene",
+    "navmapThumbnail": "images/scene-thumbnail.png",
+    "favicon": "favicon_asset"
+  },
+  "owner": "",
+  "contact": {
+    "name": "",
+    "email": ""
+  },
+  "main": "bin/game.js",
+  "tags": [],
+  "spawnPoints": [],
+  "requiredPermissions": [],
+  "featureToggles": {},
+  "scene": {
+    "base": "76,-10",
+    "parcels": [
+      "76,-10",
+      "76,-9",
+      "76,-11",
+      "75,-10",
+      "75,-9",
+      "75,-11",
+      "77,-10",
+      "77,-9",
+      "77,-11",
+      "74,-10",
+      "74,-9",
+      "74,-11",
+      "78,-10",
+      "78,-9",
+      "78,-11",
+      "76,-12",
+      "76,-8",
+      "76,-13",
+      "75,-12",
+      "75,-8",
+      "75,-13",
+      "77,-12",
+      "77,-8",
+      "77,-13",
+      "74,-12",
+      "74,-8",
+      "74,-13",
+      "78,-12",
+      "78,-8",
+      "78,-13"
+    ]
+  },
+  "name": "Debug Movement Scene"
+}
