@@ -1,7 +1,7 @@
 import { ColliderLayer, engine, Entity, InputAction, inputSystem, Raycast, RaycastQueryType, RaycastShape, raycastSystem, RaycastSystemCallback, Transform } from '@dcl/sdk/ecs'
 import { Vector3 } from '@dcl/sdk/math';
 import { groundDistance, grounded, groundNormal, lastGroundTime, prevGrounded, setGrounded } from './ground';
-import { JUMP_DECEL_TIME, GRAVITY, GROUND_SNAP_HEIGHT, GROUNDED_ANGLE, GROUNDED_HEIGHT, JOG_SPEED, JUMP_COYOTE_TIME, JUMP_HEIGHT, JUMP_HEIGHT_SPRINT, JUMP_SPEED, MAX_STEP_HEIGHT, PLAYER_COLLIDER_RADIUS, SPRINT_SPEED } from './constants';
+import { JUMP_DECEL_TIME, GRAVITY, GROUND_SNAP_HEIGHT, GROUNDED_ANGLE, GROUNDED_HEIGHT, JOG_SPEED, JUMP_COYOTE_TIME, JUMP_HEIGHT, JUMP_HEIGHT_SPRINT, JUMP_SPEED, MAX_STEP_HEIGHT, PLAYER_COLLIDER_RADIUS, SPRINT_SPEED, JUMP_SPEED_SPRINT } from './constants';
 import { playerPosition, prevActualVelocity, printvec, time, velocity, velocityLength, velocityNorm } from '.';
 import { horizontalVelocity } from './horizontal';
 
@@ -28,13 +28,14 @@ var jumpWasPressed = false;
 function applyJump(dt: number) {
   const jumpIsPressed = inputSystem.isPressed(InputAction.IA_JUMP);
 
-  var jumpSpeedMax = JUMP_HEIGHT
-    + ((JUMP_HEIGHT_SPRINT - JUMP_HEIGHT)
-      * Math.min(1, Math.max(0,
-        (Vector3.length(horizontalVelocity) - JOG_SPEED)
-        / (SPRINT_SPEED - JOG_SPEED)
-      )));
-  var jumpSpeedCap = Math.min(jumpSpeedMax, prevActualVelocity.y + GRAVITY.y * dt);
+  const sprintRatio = Math.min(1, Math.max(0,
+    (Vector3.length(horizontalVelocity) - JOG_SPEED)
+    / (SPRINT_SPEED - JOG_SPEED)
+  ));
+  const currentJumpHeight = JUMP_HEIGHT + (JUMP_HEIGHT_SPRINT - JUMP_HEIGHT) * sprintRatio;
+  const currentJumpSpeed = JUMP_SPEED + (JUMP_SPEED_SPRINT - JUMP_SPEED) * sprintRatio;
+
+  var jumpSpeedCap = prevActualVelocity.y + GRAVITY.y * dt;
 
   if (jumpStartHeight === undefined
     && jumpIsPressed
@@ -42,19 +43,19 @@ function applyJump(dt: number) {
     && (grounded || lastGroundTime > time - JUMP_COYOTE_TIME)) {
     // new jump
     jumpStartHeight = playerPosition.y;
-    jumpSpeedCap = JUMP_SPEED;
+    jumpSpeedCap = currentJumpSpeed;
   }
 
   if (jumpStartHeight !== undefined) {
-    if (jumpIsPressed && playerPosition.y + 1e-3 < jumpStartHeight + JUMP_HEIGHT) {
+    if (jumpIsPressed && playerPosition.y + 1e-3 < jumpStartHeight + currentJumpHeight) {
       // continuing jump
-      const jumpHeightRemaining = (jumpStartHeight + JUMP_HEIGHT - playerPosition.y);
+      const jumpHeightRemaining = (jumpStartHeight + currentJumpHeight - playerPosition.y);
       const requiredJumpTime = Math.sqrt(jumpHeightRemaining * 2 / JUMP_DECEL);
       const requiredSpeed = requiredJumpTime * JUMP_DECEL * Math.min(1, requiredJumpTime / dt);
       velocity.y = Math.min(requiredSpeed, jumpSpeedCap);
     } else if (velocity.y > 0) {
       // still moving up, jump not pressed -> slow down
-      velocity.y -= Math.min(velocity.y, dt * JUMP_SPEED / JUMP_DECEL_TIME);
+      velocity.y -= Math.min(velocity.y, dt * currentJumpSpeed / JUMP_DECEL_TIME);
     } else {
       // end jump
       jumpStartHeight = undefined;

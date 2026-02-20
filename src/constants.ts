@@ -4,7 +4,7 @@ export const GRAVITY = Vector3.scale(Vector3.Down(), 10.0);
 
 export const WALK_SPEED = 2.5; // max walk speed
 export const JOG_SPEED = 8.18; // max run speed
-export const SPRINT_SPEED = 12; // max sprint speed
+export const SPRINT_SPEED = 11; // max sprint speed
 export const ACCEL_TIME_GROUND = 0.25; // time to get to full speed while on the ground
 export const DECEL_TIME_GROUND = 0; // time to stop on the ground
 export const ACCEL_TIME_AIR = 0.75; // time to get to max speed in air
@@ -12,7 +12,8 @@ export const DECEL_TIME_AIR = 0.25; // time to stop in air
 
 export const JUMP_SPEED = 7; // max jump vertical velocity 
 export const JUMP_HEIGHT = 1.9; // max jump vertical height
-export const JUMP_HEIGHT_SPRINT = 2.9; // max jump vertical height while sprinting
+export const JUMP_SPEED_SPRINT = 11; // max jump vertical velocity 
+export const JUMP_HEIGHT_SPRINT = 2.95; // max jump vertical height while sprinting
 export const JUMP_DECEL_TIME = 0.125; // time to lose all vertical velocity after releasing jump
 export const JUMP_COYOTE_TIME = 0.125; // time after leaving ground while can still jump
 
