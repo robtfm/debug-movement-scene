@@ -3,37 +3,13 @@ import { Quaternion, Vector3 } from '@dcl/sdk/math';
 import { ACCEL_TIME_AIR, ACCEL_TIME_GROUND, DECEL_TIME_AIR, DECEL_TIME_GROUND, JOG_SPEED, SPRINT_SPEED, TURN_FULL_TIME, TURN_MAX_DEGREES_SEC, VEC3_HORIZONTAL_MASK, VEC3_UP, VEC3_ZERO, WALK_SPEED } from './constants';
 import { playerRotation, printvec, velocity } from '.';
 import { grounded } from './ground';
+import { movementAxis } from './input';
 
 export var orientation = 0;
 
-var movementAxis = Vector3.Zero();
 export function updateHorizontalVelocity(dt: number) {
-  updateMovementAxis();
   updateVelocity(dt);
-  setOrientation(dt);
-}
-
-Vector3.copyFrom(VEC3_ZERO, movementAxis);
-
-function updateMovementAxis() {
-  Vector3.fromArrayToRef([0,0,0], 0, movementAxis);
-  if (inputSystem.isPressed(InputAction.IA_LEFT)) {
-    Vector3.addToRef(movementAxis, Vector3.Left(), movementAxis);
-  }
-  if (inputSystem.isPressed(InputAction.IA_RIGHT)) {
-    Vector3.addToRef(movementAxis, Vector3.Right(), movementAxis);
-  }
-  if (inputSystem.isPressed(InputAction.IA_FORWARD)) {
-    Vector3.addToRef(movementAxis, Vector3.Forward(), movementAxis);
-  }
-  if (inputSystem.isPressed(InputAction.IA_BACKWARD)) {
-    Vector3.addToRef(movementAxis, Vector3.Backward(), movementAxis);
-  }
-
-  const camera = Transform.get(engine.CameraEntity);
-  Vector3.rotateToRef(movementAxis, camera.rotation, movementAxis);
-  Vector3.multiplyToRef(movementAxis, VEC3_HORIZONTAL_MASK, movementAxis);
-  Vector3.normalizeToRef(movementAxis, movementAxis);
+  updateOrientation(dt);
 }
 
 export var horizontalVelocity = Vector3.Zero();
@@ -62,7 +38,7 @@ function updateVelocity(dt: number) {
 }
 
 var targetOrientation = 0;
-function setOrientation(dt: number) {
+function updateOrientation(dt: number) {
   var currentOrientation = Quaternion.toEulerAngles(playerRotation).y;
   if (Vector3.length(movementAxis) != 0) {
     const targetFacing = Quaternion.fromLookAt(VEC3_ZERO, movementAxis, VEC3_UP);
@@ -91,3 +67,7 @@ function setOrientation(dt: number) {
   }
 }
 
+export function setOrientation(o: number) {
+  orientation = o;
+  targetOrientation = o;
+}

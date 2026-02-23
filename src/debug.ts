@@ -6,6 +6,11 @@ import { grounded, prevGrounded } from './ground';
 var jsMark: Entity;
 var jeMark: Entity;
 export function initDebugObjects() {
+    const floor = engine.addEntity();
+    MeshRenderer.setBox(floor);
+    Material.setPbrMaterial(floor, { albedoColor: Color4.create(0.1, 0.6, 0.5, 1)} )
+    Transform.create(floor, { position: {x: 0, y: -0.05, z: 0}, scale: {x: 1000, y: 0.1, z: 1000}});
+
     jsMark = engine.addEntity()
     MeshRenderer.setSphere(jsMark);
     Material.setBasicMaterial(jsMark, { diffuseColor: Color4.Purple() });
@@ -54,16 +59,11 @@ export function initDebugObjects() {
         Material.setPbrMaterial(cube2, { albedoColor: color });
     }
 
-    const cube2 = engine.addEntity();
-    AvatarAttach.create(cube2, { anchorPointId: AvatarAnchorPointType.AAPT_NAME_TAG })
-    MeshRenderer.setBox(cube2)
-    Material.setBasicMaterial(cube2, { diffuseColor: Color4.Red() });
-
     const sphere = engine.addEntity();
     Transform.create(sphere, { position: { x: 0, z: 0, y: 5.5 }, scale: Vector3.scale(Vector3.One(), 10) });
     MeshRenderer.setSphere(sphere);
     MeshCollider.setSphere(sphere);
-    Material.setBasicMaterial(sphere, { diffuseColor: Color4.Blue() });
+    Material.setPbrMaterial(sphere, { albedoColor: Color4.Blue() });
     engine.addSystem((dt) => {
         let h = 5.5 + 2.5 * Math.sin(time);
         Transform.createOrReplace(sphere, { position: { x: 0, z: 0, y: h }, scale: Vector3.scale(Vector3.One(), 10) });

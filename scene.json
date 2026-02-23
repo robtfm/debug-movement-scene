@@ -16,7 +16,10 @@
   "tags": [],
   "spawnPoints": [],
   "requiredPermissions": [],
-  "featureToggles": {},
+  "featureToggles": {
+    "voiceChat": "enabled",
+    "portableExperiences": "enabled"
+  },
   "scene": {
     "base": "76,-10",
     "parcels": [
@@ -52,5 +55,14 @@
       "78,-13"
     ]
   },
-  "name": "Debug Movement Scene"
+  "name": "Debug Movement Scene",
+  "worldConfiguration": {
+    "name": "robtfm.dcl.eth"
+  },
+  "creator": "",
+  "skyboxConfig": {},
+  "source": {
+    "origin": "creator-hub",
+    "projectId": "8c5e3cc8-b342-43be-a601-73b8e6d375a0"
+  }
 }
