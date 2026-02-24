@@ -16,13 +16,13 @@ export var horizontalVelocity = Vector3.Zero();
 var transition = Vector3.Zero();
 function updateVelocity(dt: number) {
   Vector3.fromArrayToRef([velocity.x, 0, velocity.z], 0, horizontalVelocity);
-  const decelerating = Vector3.lengthSquared(movementAxis) === 0 ||  Vector3.dot(movementAxis, horizontalVelocity) <= -0.0001;
+  const decelerating = Vector3.lengthSquared(movementAxis) === 0 || Vector3.dot(movementAxis, horizontalVelocity) <= -0.0001;
   const accelFactor = grounded ?
     (decelerating ? DECEL_TIME_GROUND : ACCEL_TIME_GROUND) :
     (decelerating ? DECEL_TIME_AIR : ACCEL_TIME_AIR);
-  const targetSpeed = inputSystem.isPressed(InputAction.IA_MODIFIER) ? SPRINT_SPEED 
-    : inputSystem.isPressed(InputAction.IA_WALK) ? WALK_SPEED 
-    : JOG_SPEED;
+  const targetSpeed = inputSystem.isPressed(InputAction.IA_MODIFIER) ? SPRINT_SPEED
+    : inputSystem.isPressed(InputAction.IA_WALK) ? WALK_SPEED
+      : JOG_SPEED;
 
   Vector3.scaleToRef(movementAxis, targetSpeed, transition);
   Vector3.subtractToRef(transition, horizontalVelocity, transition)
@@ -37,9 +37,11 @@ function updateVelocity(dt: number) {
   }
 }
 
-var targetOrientation = 0;
+export var targetOrientation = 0;
 function updateOrientation(dt: number) {
-  var currentOrientation = Quaternion.toEulerAngles(playerRotation).y;
+  const dbgo = orientation;
+  orientation = Quaternion.toEulerAngles(playerRotation).y;
+  const dbgo2 = orientation;
   if (Vector3.length(movementAxis) != 0) {
     const targetFacing = Quaternion.fromLookAt(VEC3_ZERO, movementAxis, VEC3_UP);
     targetOrientation = Quaternion.toEulerAngles(targetFacing).y;
@@ -54,14 +56,20 @@ function updateOrientation(dt: number) {
     if (Math.abs(targetOrientation - orientation) < 1) {
       orientation = targetOrientation;
     } else {
-      currentOrientation = relativeDegrees(targetOrientation, currentOrientation);
+      const relo = relativeDegrees(targetOrientation, orientation);
+      orientation = relativeDegrees(targetOrientation, orientation);
       let perc = Math.min(dt / TURN_FULL_TIME, 1);
+      const flooro = orientation - TURN_MAX_DEGREES_SEC * dt;
+      const capo = orientation + TURN_MAX_DEGREES_SEC * dt
+      const acto = targetOrientation * perc + orientation * (1 - perc);
+
       orientation = Math.max(
-        currentOrientation - TURN_MAX_DEGREES_SEC * dt,
+        orientation - TURN_MAX_DEGREES_SEC * dt,
         Math.min(
-          currentOrientation + TURN_MAX_DEGREES_SEC * dt,
-          targetOrientation * perc + currentOrientation * (1 - perc)
+          orientation + TURN_MAX_DEGREES_SEC * dt,
+          targetOrientation * perc + orientation * (1 - perc)
         ));
+      
       orientation = relativeDegrees(180, orientation);
     }
   }
@@ -69,5 +77,9 @@ function updateOrientation(dt: number) {
 
 export function setOrientation(o: number) {
   orientation = o;
+  targetOrientation = o;
+}
+
+export function setTargetOrientation(o: number) {
   targetOrientation = o;
 }

@@ -1,4 +1,4 @@
-import { AvatarMovement, AvatarMovementInfo, engine, InputAction, inputSystem, Transform } from '@dcl/sdk/ecs'
+import { AvatarMovement, AvatarMovementInfo, engine, InputAction, inputSystem, PointerEventType, Transform } from '@dcl/sdk/ecs'
 import { Quaternion, Vector3 } from '@dcl/sdk/math';
 import { getExplorerConfiguration } from '~system/EnvironmentApi';
 import { initDebugObjects } from './debug';
@@ -7,6 +7,8 @@ import { orientation, setOrientation, updateHorizontalVelocity } from './horizon
 import { initStepCasts, updateVerticalVelocity } from './vertical';
 import { initJetpackMode, moveJetpack } from './jetpack';
 import { updateMovementAxis } from './input';
+import { initPool } from './pool';
+import { initLadder } from './ladder';
 
 // export all the functions required to make the scene work
 export * from '@dcl/sdk'
@@ -33,6 +35,8 @@ export function main() {
   engine.addSystem(changeMode);
 
   initJetpackMode();
+  initPool();
+  initLadder();
 }
 
 export var time = 0;
