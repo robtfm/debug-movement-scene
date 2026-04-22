@@ -60,7 +60,7 @@ export function initDebugObjects() {
     }
 
     const sphere = engine.addEntity();
-    Transform.create(sphere, { position: { x: 0, z: 0, y: 5.5 }, scale: Vector3.scale(Vector3.One(), 10) });
+    Transform.create(sphere, { position: { x: 10, z: 0, y: 5.5 }, scale: Vector3.scale(Vector3.One(), 10) });
     MeshRenderer.setSphere(sphere);
     MeshCollider.setSphere(sphere);
     Material.setPbrMaterial(sphere, { albedoColor: Color4.Blue() });
