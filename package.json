@@ -4,7 +4,7 @@
   "version": "1.0.0",
   "dependencies": {
     "@dcl/js-runtime": "7.20.2-22309446491.commit-b942bde",
-    "@dcl/sdk": "^7.20.2-22309446491.commit-b942bde"
+    "@dcl/sdk": "https://sdk-team-cdn.decentraland.org/@dcl/js-sdk-toolchain/branch/1377/merge/dcl-sdk-7.22.5-24715381227.commit-c17cf4f.tgz"
   },
   "engines": {
     "node": ">=16.0.0",

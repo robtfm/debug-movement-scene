@@ -1,11 +1,18 @@
 import { AvatarMovement, engine, InputAction, inputSystem, Material, MaterialTransparencyMode, MeshCollider, MeshRenderer, Transform, TriggerArea, triggerAreaEventsSystem } from "@dcl/sdk/ecs";
 import { Color4, Vector3 } from "@dcl/sdk/math";
 import { GRAVITY } from "./constants";
-import { tick, velocity } from ".";
+import { tick, time, velocity, velocityLength } from ".";
 import { orientation, targetOrientation } from "./horizontal";
 import { grounded, setGrounded } from "./ground";
 
+// Keep the swim animation playing briefly after leaving the trigger so that
+// buoyancy-driven pop-outs at the surface don't reset the clip to frame 0
+// each time we re-enter. Physics still gate strictly on being inside the
+// trigger — applying buoyancy above water would amplify the oscillation.
+const SWIM_GRACE_SECONDS = 0.25;
+
 var waterTick = -1;
+var lastWaterTime = -Infinity;
 
 export function initPool() {
     const poolVisual = engine.addEntity();
@@ -15,7 +22,7 @@ export function initPool() {
         albedoColor: Color4.create(0.0, 0.2, 1.0, 0.4),
         transparencyMode: MaterialTransparencyMode.MTM_ALPHA_BLEND,
     })
-    Transform.create(poolVisual, { position: { x: 35, y: 5, z: 25 }, scale: { x: 20, y: 10, z: 20 } })
+    Transform.create(poolVisual, { position: { x: 35, y: 4.55, z: 25 }, scale: { x: 20, y: 9.1, z: 20 } })
 
     TriggerArea.setBox(pool);
     Transform.create(pool, { position: { x: 35, y: 5 - 1.5 / 2, z: 25 }, scale: { x: 20, y: 10 - 1.5, z: 20 } })
@@ -36,36 +43,50 @@ export function initPool() {
     triggerAreaEventsSystem.onTriggerStay(pool, function (result) {
         if (result.trigger?.entity !== engine.PlayerEntity) return;
         waterTick = tick;
+        lastWaterTime = time;
         setGrounded(true)
     })
     engine.addSystem(waterMovement, 100000 - 6);
 }
 
 function waterMovement(dt: number) {
-    if (waterTick != tick) {
+    const inWater = waterTick == tick;
+    const animActive = time - lastWaterTime < SWIM_GRACE_SECONDS;
+
+    if (!inWater && !animActive) {
         return;
     }
 
-    velocity.y += 12 * dt;
-
-    if (inputSystem.isPressed(InputAction.IA_JUMP)) {
+    if (inWater) {
         velocity.y += 12 * dt;
-    }
-    if (inputSystem.isPressed(InputAction.IA_MODIFIER)) {
-        velocity.y -= 12 * dt;
-    }
 
-    const dragFactor = Math.exp(-3 * dt);
-    velocity.x *= dragFactor;
-    velocity.y *= dragFactor;
-    velocity.z *= dragFactor;
+        if (inputSystem.isPressed(InputAction.IA_JUMP)) {
+            velocity.y += 12 * dt;
+        }
+        if (inputSystem.isPressed(InputAction.IA_MODIFIER)) {
+            velocity.y -= 12 * dt;
+        }
 
-    if (velocity.y > 3) {
-        velocity.y = 3;
+        const dragFactor = Math.exp(-3 * dt);
+        velocity.x *= dragFactor;
+        velocity.y *= dragFactor;
+        velocity.z *= dragFactor;
+
+        if (velocity.y > 3) {
+            velocity.y = 3;
+        }
     }
 
     AvatarMovement.createOrReplace(engine.PlayerEntity, {
         velocity,
         orientation: -orientation,
+        animation: {
+            src: 'assets/animations/swim.glb',
+            speed: Math.max(0.3, velocityLength / 2),
+            loop: true,
+            idle: false,
+            transitionSeconds: 0.4,
+            sounds: [],
+        },
     })
 }
